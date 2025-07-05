@@ -21,7 +21,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import io.ktor.serialization.kotlinx.json.json
-import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -105,7 +104,7 @@ suspend inline fun<reified T> safeApiCall(
             is HttpRequestTimeoutException -> "Unable to reach the server. Please try again after a moment."
             is SerializationException -> "Unexpected data format received. Please try again."
             is ConnectTimeoutException -> "Server is not responding. Please try again later."
-            is IOException -> "Unable to connect to the network. Please ensure your device is connected and try again."
+            is kotlinx.io.IOException -> "Unable to connect to the network. Please ensure your device is connected and try again."
             else -> "Something went wrong. Please try again or contact support if the issue persists."
         }
         println("SafeApiCall: errorMessage = $errorMessage")

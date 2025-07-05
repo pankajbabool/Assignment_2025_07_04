@@ -1,5 +1,7 @@
 package com.example.assignment.data.model
 
+import com.example.assignment.data.enums.WeatherCode
+import com.example.assignment.extensions.formatLocalDateTime
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,4 +29,42 @@ data class WeatherApiResponse(
         val weather_code: String = "",
         val wind_speed_10m: String = ""
     )
+}
+
+@Serializable
+data class WeatherData(
+    val currentTemperature: String,
+    val currentWeatherDescription: String,
+    val currentWindSpeed: String,
+    val updatedTime: String,
+    val weatherCode: Int = -1
+)
+
+fun WeatherApiResponse.toWeatherData(): WeatherData {
+    val responseData = this
+
+    val currentTemperature = responseData.current.temperature_2m
+    val currentTemperatureUnits = responseData.current_units.temperature_2m
+    val currentTemperatureWithUnits = "$currentTemperature $currentTemperatureUnits"
+
+    val currentWindSpeed = responseData.current.wind_speed_10m
+    val currentWindSpeedUnits = responseData.current_units.wind_speed_10m
+    val currentWindSpeedWithUnits = "$currentWindSpeed $currentWindSpeedUnits"
+
+
+    val updatedTime = responseData.current.time
+    val formattedTime = formatLocalDateTime(updatedTime)
+
+    val weatherCode = responseData.current.weather_code
+    val weatherDescription = WeatherCode.fromCode(weatherCode)?.description.toString()
+
+    val weatherData = WeatherData(
+        currentTemperature = currentTemperatureWithUnits,
+        currentWeatherDescription = weatherDescription,
+        currentWindSpeed = currentWindSpeedWithUnits,
+        updatedTime = formattedTime,
+        weatherCode = weatherCode
+    )
+
+    return weatherData
 }

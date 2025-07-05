@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -50,7 +52,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import assignment.composeapp.generated.resources.Res
-import assignment.composeapp.generated.resources.png_storm_with_rain
+import assignment.composeapp.generated.resources.png_app_icon
 import assignment.composeapp.generated.resources.svg_location_marker_outline
 import assignment.composeapp.generated.resources.svg_wind
 import com.example.assignment.bridge.platformBridge
@@ -204,7 +206,7 @@ private fun WeatherScreenContent(
         }
 
         if (state.currentTemperature != null) {
-            Box(
+            Column (
                 modifier = Modifier
                     .fillMaxWidth()
                     .fillMaxHeight(0.7f)
@@ -213,49 +215,46 @@ private fun WeatherScreenContent(
                         brush = Brush.verticalGradient(listOf(Color.White.copy(alpha = 0.25f), Color.White)),
                         alpha = 0.1f
                     )
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.Bottom,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                val cloudImage = state.cloudImage?.image
 
                 Image(
-                    painter = painterResource(Res.drawable.png_storm_with_rain),
+                    painter = painterResource(cloudImage ?: Res.drawable.png_app_icon),
                     contentDescription = null,
                     contentScale = ContentScale.FillWidth,
                     modifier = Modifier
-                        .align(Alignment.Center)
-                        .fillMaxWidth()
+                        .fillMaxWidth(if (cloudImage != null) 0.8f else 0.5f)
                 )
 
-                Column (
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .padding(bottom = 16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
+                Spacer(modifier = Modifier.height(32.dp))
 
-                    state.currentTemperature?.let { temperature ->
-                        Text(
-                            text = temperature,
-                            style = LocalTextStyle.current.copy(
-                                fontFamily = FontFamily(getW500Font()),
-                                fontWeight = FontWeight.W500,
-                                fontSize = 48.sp,
-                                color = ColorWhitePure
-                            )
+                state.currentTemperature?.let { temperature ->
+                    Text(
+                        text = temperature,
+                        style = LocalTextStyle.current.copy(
+                            fontFamily = FontFamily(getW500Font()),
+                            fontWeight = FontWeight.W500,
+                            fontSize = 48.sp,
+                            color = ColorWhitePure
                         )
-                    }
-
-                    state.currentWeatherDescription?.let { weatherDescription ->
-                        Text(
-                            text = weatherDescription,
-                            style = LocalTextStyle.current.copy(
-                                color = ColorWhitePure
-                            ),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth(0.8f)
-                        )
-                    }
+                    )
                 }
 
+                state.currentWeatherDescription?.let { weatherDescription ->
+                    Text(
+                        text = weatherDescription,
+                        style = LocalTextStyle.current.copy(
+                            color = ColorWhitePure
+                        ),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier
+                            .fillMaxWidth(0.8f)
+                    )
+                }
             }
 
             state.currentWindSpeed?.let { windSpeed ->
