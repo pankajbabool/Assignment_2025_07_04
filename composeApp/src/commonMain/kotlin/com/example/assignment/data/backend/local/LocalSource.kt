@@ -7,6 +7,19 @@ import com.example.assignment.extensions.toMyDataClass
 
 class LocalSource {
 
+    suspend fun getLastSaved(): String? {
+        val key = "last_saved"
+        val value = MyPreferences.getValue<String?>(key) as String?
+        println("LAST SAVED: $value")
+        return value
+    }
+
+    suspend fun setLastSaved(latitude: Double, longitude: Double) {
+        val key = "last_saved"
+        val value = "${latitude}_${longitude}"
+        MyPreferences.setValue<String>(value = value, key = key)
+    }
+
     suspend fun getWeatherInfo(
         latitude: Double,
         longitude: Double,

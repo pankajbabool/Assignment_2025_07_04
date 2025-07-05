@@ -37,11 +37,16 @@ data class WeatherData(
     val currentWeatherDescription: String,
     val currentWindSpeed: String,
     val updatedTime: String,
-    val weatherCode: Int = -1
+    val weatherCode: Int = -1,
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0
 )
 
 fun WeatherApiResponse.toWeatherData(): WeatherData {
     val responseData = this
+
+    val latitude = responseData.latitude
+    val longitude = responseData.longitude
 
     val currentTemperature = responseData.current.temperature_2m
     val currentTemperatureUnits = responseData.current_units.temperature_2m
@@ -63,7 +68,9 @@ fun WeatherApiResponse.toWeatherData(): WeatherData {
         currentWeatherDescription = weatherDescription,
         currentWindSpeed = currentWindSpeedWithUnits,
         updatedTime = formattedTime,
-        weatherCode = weatherCode
+        weatherCode = weatherCode,
+        latitude = latitude,
+        longitude = longitude
     )
 
     return weatherData

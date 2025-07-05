@@ -15,7 +15,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.RotateRight
@@ -101,12 +103,13 @@ private fun WeatherScreenContent(
         "Bangalore" to Pair(12.9629, 77.5775),
         "Mumbai" to Pair(18.9582, 72.8321),
     )
-    var dropDownSelected by remember { mutableStateOf(dropDownOptions.first()) }
+    var dropDownSelected: Pair<String, Pair<Double, Double>>? by remember { mutableStateOf(null) }
     var expanded by remember { mutableStateOf(false) }
 
     LaunchedEffect (dropDownSelected) {
-        val latitude = dropDownSelected.second.first
-        val longitude = dropDownSelected.second.second
+        dropDownSelected ?: return@LaunchedEffect
+        val latitude = dropDownSelected!!.second.first
+        val longitude = dropDownSelected!!.second.second
         onEvent(WeatherScreenEvents.GetWeatherInfo(latitude, longitude))
     }
 
@@ -115,6 +118,7 @@ private fun WeatherScreenContent(
             .fillMaxSize()
             .background(Color.Black)
             .systemBarsPadding()
+            .verticalScroll(rememberScrollState())
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -133,18 +137,17 @@ private fun WeatherScreenContent(
                 ) {
                     Row(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .menuAnchor(MenuAnchorType.PrimaryNotEditable, true),
+                            .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         Box(
                             modifier = Modifier
                                 .size(50.dp)
-                                .background(
-                                    Color.White.copy(alpha = 0.1f),
-                                    RoundedCornerShape(16.dp)
-                                )
+                                .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                                .clickable {
+                                    onEvent(WeatherScreenEvents.GetCurrentLocation)
+                                }
                                 .padding(8.dp),
                             contentAlignment = Alignment.Center
                         ) {
@@ -155,8 +158,16 @@ private fun WeatherScreenContent(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
+
+                        val currentlySelected = dropDownSelected?.second
+                        val name = if (state.latitude == currentlySelected?.first && state.longitude == currentlySelected?.second) {
+                            dropDownSelected?.first ?: "Unknown Location"
+                        } else {
+                            "Current Location"
+                        }
+
                         Text(
-                            text = dropDownSelected.first,
+                            text = name,
                             style = LocalTextStyle.current.copy(
                                 fontFamily = FontFamily(getW500Font()),
                                 fontWeight = FontWeight.W500,
@@ -168,6 +179,7 @@ private fun WeatherScreenContent(
                             modifier = Modifier
                                 .size(50.dp)
                                 .background(Color.White.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+                                .menuAnchor(MenuAnchorType.PrimaryNotEditable, true)
                                 .clickable { expanded = true }
                                 .padding(8.dp),
                             contentAlignment = Alignment.Center
@@ -220,6 +232,9 @@ private fun WeatherScreenContent(
                 verticalArrangement = Arrangement.Bottom,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+
+                Spacer(modifier = Modifier.height(100.dp))
+
                 val cloudImage = state.cloudImage?.image
 
                 Image(
@@ -250,6 +265,7 @@ private fun WeatherScreenContent(
                         style = LocalTextStyle.current.copy(
                             color = ColorWhitePure
                         ),
+                        fontSize = 20.sp,
                         textAlign = TextAlign.Center,
                         modifier = Modifier
                             .fillMaxWidth(0.8f)
@@ -283,7 +299,8 @@ private fun WeatherScreenContent(
                         text = windSpeed,
                         style = LocalTextStyle.current.copy(
                             color = ColorWhitePure
-                        )
+                        ),
+                        fontSize = 20.sp,
                     )
                 }
             }
@@ -301,9 +318,11 @@ private fun WeatherScreenContent(
             )
             IconButton (
                 onClick = {
-                    val latitude = dropDownSelected.second.first
-                    val longitude = dropDownSelected.second.second
-                    onEvent(WeatherScreenEvents.GetWeatherInfo(latitude, longitude))
+                    if (state.latitude != null && state.longitude != null) {
+                        val latitude = state.latitude
+                        val longitude = state.longitude
+                        onEvent(WeatherScreenEvents.GetWeatherInfo(latitude, longitude))
+                    }
                 },
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = Color.White.copy(alpha = 0.1f)
@@ -315,6 +334,15 @@ private fun WeatherScreenContent(
                     tint = ColorWhitePure
                 )
             }
+        }
+
+        if (state.latitude != null && state.longitude != null) {
+            Text(
+                text = "lat: ${state.latitude.toString().take(9)}, long: ${state.longitude.toString().take(9)}",
+                style = LocalTextStyle.current.copy(
+                    color = ColorWhitePure
+                )
+            )
         }
     }
 

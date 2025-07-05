@@ -15,6 +15,10 @@ class WeatherRepository(
     private val _weatherDataFlow = MutableStateFlow<Result<WeatherData?>?>(null)
     val weatherDataFlow = _weatherDataFlow.asStateFlow()
 
+    suspend fun getLastSaved(): String? {
+        return localSource.getLastSaved()
+    }
+
     suspend fun getWeatherInfo(
         latitude: Double,
         longitude: Double,
@@ -39,6 +43,10 @@ class WeatherRepository(
                 latitude = latitude,
                 longitude = longitude,
                 weatherData = dataFromRemote.getOrNull()
+            )
+            localSource.setLastSaved(
+                latitude = latitude,
+                longitude = longitude
             )
         } else {
             _weatherDataFlow.update { Result.failure(dataFromRemote.exceptionOrNull()!!) }

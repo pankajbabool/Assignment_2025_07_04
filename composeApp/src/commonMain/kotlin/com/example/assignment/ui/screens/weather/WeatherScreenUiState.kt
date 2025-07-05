@@ -6,6 +6,9 @@ data class WeatherScreenUiState(
     val isLoading: Boolean = false,
     val error: String? = null,
 
+    val latitude: Double? = null,
+    val longitude: Double? = null,
+
     val currentTemperature: String? = null,
     val currentWeatherDescription: String? = null,
     val currentWindSpeed: String? = null,
