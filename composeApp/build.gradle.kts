@@ -36,6 +36,9 @@ kotlin {
             implementation(libs.androidx.core.splashscreen)
 
             implementation(libs.bundles.android.ktor)
+
+            implementation(libs.koin.android)
+            implementation(libs.koin.androidx.compose)
         }
         commonMain.dependencies {
             implementation(compose.components.resources)
@@ -57,6 +60,10 @@ kotlin {
             implementation(libs.bundles.common.coil)
             implementation(libs.bundles.common.datastore)
             implementation(libs.bundles.common.compass)
+
+            api(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
         iosMain.dependencies {
             implementation(libs.bundles.ios.ktor)

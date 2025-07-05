@@ -1,6 +1,8 @@
 package com.example.assignment
 
 import android.app.Application
+import com.example.assignment.di.initKoin
+import org.koin.android.ext.koin.androidContext
 
 class AppClass:  Application() {
 
@@ -12,5 +14,9 @@ class AppClass:  Application() {
     override fun onCreate() {
         super.onCreate()
         instance = this
+
+        initKoin {
+            androidContext(this@AppClass)
+        }
     }
 }
